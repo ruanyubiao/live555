@@ -253,24 +253,27 @@ void Groupsock::multicastSendOnly() {
 #endif
 }
 
-Boolean Groupsock::output(UsageEnvironment& env, unsigned char* buffer, unsigned bufferSize) {
+int Groupsock::output(UsageEnvironment& env, unsigned char* buffer, unsigned bufferSize) {
   do {
     // First, do the datagram send, to each destination:
-    Boolean writeSuccess = True;
+    int writeSuccess = 0;
     for (destRecord* dests = fDests; dests != NULL; dests = dests->fNext) {
       if (!write(dests->fGroupEId.groupAddress(), dests->fGroupEId.ttl(), buffer, bufferSize)) {
-	writeSuccess = False;
+	writeSuccess = -1;
 	break;
       }
+      else {
+          writeSuccess++;
+      }
     }
-    if (!writeSuccess) break;
+    if (writeSuccess < 0) break;
     statsOutgoing.countPacket(bufferSize);
     statsGroupOutgoing.countPacket(bufferSize);
 
     if (DebugLevel >= 3) {
       env << *this << ": wrote " << bufferSize << " bytes, ttl " << (unsigned)ttl() << "\n";
     }
-    return True;
+    return writeSuccess;
   } while (0);
 
   if (DebugLevel >= 0) { // this is a fatal error
@@ -278,7 +281,7 @@ Boolean Groupsock::output(UsageEnvironment& env, unsigned char* buffer, unsigned
     env.setResultMsg("Groupsock write failed: ", msg);
     delete[] (char*)msg;
   }
-  return False;
+  return -1;
 }
 
 Boolean Groupsock::handleRead(unsigned char* buffer, unsigned bufferMaxSize,

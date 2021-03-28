@@ -126,7 +126,7 @@ public:
 
   void multicastSendOnly(); // send, but don't receive any multicast packets
 
-  virtual Boolean output(UsageEnvironment& env, unsigned char* buffer, unsigned bufferSize);
+  virtual int output(UsageEnvironment& env, unsigned char* buffer, unsigned bufferSize);
 
   static NetInterfaceTrafficStats statsIncoming;
   static NetInterfaceTrafficStats statsOutgoing;
