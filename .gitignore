@@ -1,1 +1,7 @@
+Debug
+Release
+*.obj
+*.lib
+.vs
 bin
+out
