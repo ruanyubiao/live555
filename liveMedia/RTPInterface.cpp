@@ -23,6 +23,8 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 #include "RTPInterface.hh"
 #include <GroupsockHelper.hh>
 #include <stdio.h>
+#include <chrono>
+#include <thread>
 
 ////////// Helper Functions - Definition //////////
 
@@ -137,7 +139,7 @@ RTPInterface::RTPInterface(Medium* owner, Groupsock* gs)
   // even if the socket was previously reported (e.g., by "select()") as having data available.
   // (This can supposedly happen if the UDP checksum fails, for example.)
   makeSocketNonBlocking(fGS->socketNum());
-  increaseSendBufferTo(envir(), fGS->socketNum(), 50*1024);
+  increaseSendBufferTo(envir(), fGS->socketNum(), 5000 * 1024);
 }
 
 RTPInterface::~RTPInterface() {
@@ -228,8 +230,29 @@ void RTPInterface::clearServerRequestAlternativeByteHandler(UsageEnvironment& en
 Boolean RTPInterface::sendPacket(unsigned char* packet, unsigned packetSize) {
   Boolean success = True; // we'll return False instead if any of the sends fail
 
+#ifdef DEBUG_SEND
+    fprintf(stderr, "sendPacket: %d", packetSize);
+    for (int i = 0; i < 16; ++i)
+    {
+        fprintf(stderr, ", %02x", packet[i]);
+    }
+    if (packetSize >= 16)
+    {
+        fprintf(stderr, "\n                             ");
+        for (int i = 0; i < 16; ++i)
+        {
+            fprintf(stderr, ", %02x", packet[packetSize - 16 + i]);
+        }
+    }
+
+    fprintf(stderr, "\n");
+    fflush(stderr);
+#endif
+
+
+  auto groupCount = fGS->output(envir(), packet, packetSize);
   // Normal case: Send as a UDP packet:
-  if (!fGS->output(envir(), packet, packetSize)) success = False;
+  if (groupCount < 0) success = False;
 
   // Also, send over each of our TCP sockets:
   tcpStreamRecord* nextStream;
@@ -240,7 +263,8 @@ Boolean RTPInterface::sendPacket(unsigned char* packet, unsigned packetSize) {
       success = False;
     }
   }
-
+  
+  if (groupCount > 0) std::this_thread::sleep_for(std::chrono::microseconds(200));
   return success;
 }
 

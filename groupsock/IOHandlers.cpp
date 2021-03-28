@@ -23,7 +23,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 
 //##### TEMP: Use a single buffer, sized for UDP tunnels:
 //##### This assumes that the I/O handlers are non-reentrant
-static unsigned const maxPacketLength = 50*1024; // bytes
+static unsigned const maxPacketLength = 5000 * 1024; // bytes
     // This is usually overkill, because UDP packets are usually no larger
     // than the typical Ethernet MTU (1500 bytes).  However, I've seen
     // reports of Windows Media Servers sending UDP packets as large as
