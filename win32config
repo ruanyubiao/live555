@@ -19,10 +19,10 @@ UI_OPTS =		$(guilflags) $(guilibsdll)
 CONSOLE_UI_OPTS =		$(conlflags) $(conlibsdll)
 CPU=i386
 
-TOOLS32	=		c:\Program Files\DevStudio\Vc
+TOOLS32	=		C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.28.29910
 COMPILE_OPTS =		$(INCLUDES) $(cdebug) $(cflags) $(cvarsdll) -I. -I"$(TOOLS32)\include" -DNO_OPENSSL=1
 C =			c
-C_COMPILER =		"$(TOOLS32)\bin\cl"
+C_COMPILER =		"$(TOOLS32)\bin\Hostx64\x86\cl"
 C_FLAGS =		$(COMPILE_OPTS)
 CPP =			cpp
 CPLUSPLUS_COMPILER =	$(C_COMPILER)
@@ -30,7 +30,7 @@ CPLUSPLUS_FLAGS =	$(COMPILE_OPTS)
 OBJ =			obj
 LINK =			$(link) -out:
 LIBRARY_LINK =		lib -out:
-LINK_OPTS_0 =		$(linkdebug) msvcirt.lib
+LINK_OPTS_0 =		$(linkdebug) msvcrt.lib
 LIBRARY_LINK_OPTS =	
 LINK_OPTS =		$(LINK_OPTS_0) $(UI_OPTS)
 CONSOLE_LINK_OPTS =	$(LINK_OPTS_0) $(CONSOLE_UI_OPTS)
@@ -42,6 +42,6 @@ MULTIMEDIA_LIBS =	winmm.lib
 EXE =			.exe
 PLATFORM = Windows
 
-rc32 = "$(TOOLS32)\bin\rc"
+rc32 = "$(TOOLS32)\bin\Hostx64\x86\rc"
 .rc.res:
 	$(rc32) $<
